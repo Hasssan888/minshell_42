@@ -1,14 +1,7 @@
 #include "main.h"
 
-void	infile(t_command *node1, t_pipex *pipex)
+void	infile(t_pipex *pipex)
 {
-
-	pipex->infile = open(av[1], O_RDONLY);
-	if (pipex->infile == -1)
-	{
-		perror("infile fail");
-		exit(-1);
-	}
 	close(pipex->end[0]);
 	dup2(pipex->infile, STDIN_FILENO);
 	close(pipex->infile);
@@ -16,34 +9,55 @@ void	infile(t_command *node1, t_pipex *pipex)
 	close(pipex->end[1]);
 }
 
-void	outfile(int ac, char **av, t_pipex *pipex)
-{
-	if (pipex->indixe == 2)
-		pipex->outfile = open(av[ac - 1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
-	else
-		pipex->outfile = open(av[ac - 1], O_CREAT | O_WRONLY | O_APPEND, 0644);
-	close(pipex->end[0]);
-	close(pipex->end[1]);
-	if (pipex->outfile == -1)
-	{
-		perror("outfile fail");
-		exit(-1);
-	}
-	dup2(pipex->outfile, STDOUT_FILENO);
-	close(pipex->outfile);
-}
+// char	*ft_check_r(t_command *node)
+// {
+// 	t_command *check_r = node->next;
+// 	while (check_r)
+// 	{
+// 		if(check_r->type != RED_OUT)
+// 			break;
+// 		check_r = check_r->next;
+// 	}
+// 	return(check_r->file);
+// }
 
+// void	outfile(t_command *node, t_pipex *pipex)
+// {
+// 	if (ft_lstlast(node)->type == RED_OUT)
+// 		pipex->outfile = open(ft_lstlast(node)->file, O_RDWR | O_TRUNC | O_CREAT, 0644);
+// 	close(pipex->end[0]);
+// 	close(pipex->end[1]);
+// 	if (pipex->outfile == -1)
+// 	{
+// 		perror("outfile fail");
+// 		exit(-1);
+// 	}
+// 	dup2(pipex->outfile, STDOUT_FILENO);
+// 	close(pipex->outfile);
+// }
+//< infile	ls | grep f | wc -l > outfile
 void	all_cmd(t_command *node1, char **env, t_pipex *pipex)
 {
-	if (pipex->i == 2)
-		infile(node1, pipex);
-	else if (ac - 2 != pipex->i)
-	{
+	// printf("allcmd >> i = %d\n", pipex->i);
+	// printf("type = %d\n", node1->type);
+
+	// if (pipex->i == 1)
+	// {
+	// 	printf("infile\n");
+	// 	infile(pipex);
+	// 	//printf("infile >> i = %d\n", pipex->i);
+	// }
+	// else if (node1->next->type == RED_OUT)
+	// {
+
+	// 	printf("outfile = %s\n", node1->next->file);
+	// 	outfile(node1, pipex);
+	// }
+	// else
+	// {
 		close(pipex->end[0]);
 		dup2(pipex->end[1], STDOUT_FILENO);
 		close(pipex->end[1]);
-	}
-	else
-		outfile(ac, av, pipex);
-	ft_excute(av[pipex->i], env);
+	// }
+	ft_excute(*node1->args, env);
 }

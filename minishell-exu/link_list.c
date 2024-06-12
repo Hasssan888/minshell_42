@@ -16,3 +16,15 @@ int	ft_lstsize(t_command *lst)
 	}
 	return (size);
 }
+
+t_command	*ft_lstlast(t_command *lst)
+{
+	t_command	*current;
+
+	if (lst == NULL)
+		return (NULL);
+	current = lst;
+	while (current->next != NULL)
+		current = current->next;
+	return (current);
+}
