@@ -21,8 +21,14 @@
 # define AND_OP 	9
 # define FLE		10
 # define APP		11
+# define HRER_DOC		12
 
 # define MAX_ARGS 	15
+
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 1
+# endif
+
 
 typedef struct s_pipex
 {
@@ -45,6 +51,7 @@ typedef struct s_pipex
 	int		count_read_out;
 	int		count_read_in;
 	int		count_pipe;
+	int		count_here_doc;
 	int		flag;
 }			t_pipex;
 
@@ -69,9 +76,6 @@ int	ft_lstsize(t_command *lst);
 t_command	*ft_lstlast(t_command *lst);
 
 
-//allcmd
-
-void	all_cmd(t_command *node1, char **env, t_pipex *pipex);
 
 
 //excut
@@ -95,6 +99,7 @@ size_t	ft_strlen(const char *str);
 
 char	*ft_strjoin(char const *s1, char const *s2);
 char	**ft_split(char const *s, char c);
+char	*ft_strchr(const char *s, int c);
 
 // error
 void	ft_putstr_fd(char *s, int fd);
@@ -103,5 +108,32 @@ void	ft_error(char *av);
 char	*ft_strchr(const char *s, int c);
 int	ft_strcmp(char *s1, char *s2);
 
+// open_file
+
+void    ft_count_pipe(t_command *list, t_pipex *p);
+void    ft_count_read_out(t_command *node, t_pipex *p);
+void    ft_count_read_in(t_command *node, t_pipex *p);
+void    open_infile(t_command *node, t_pipex *p);
+void    open_outfile(t_command *node, t_pipex *p);
+
+// allcmd
+
+void	fork_pipe(t_command *node1, char **env, t_pipex *p);
+
+// one_cmd
+
+void    ft_onecmd(t_command *node, char **ev, t_pipex *p);
+void    ft_onecmd_her(t_command *node, char **ev, t_pipex *p);
+
+
+// get_next_line
+
+char	*get_next_line(int fd);
+
+// here_doc
+
+void	open_here_doc(t_command *node, t_pipex *pipex);
+void	here_doc(t_command *node, t_pipex *pipex);
+void    ft_count_here_doc(t_command *node, t_pipex *p);
 
 #endif

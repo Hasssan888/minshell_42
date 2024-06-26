@@ -1,63 +1,61 @@
 #include "main.h"
 
-void	infile(t_pipex *pipex)
+void	fork_pipe(t_command *node1, char **env, t_pipex *p)
 {
-	close(pipex->end[0]);
-	dup2(pipex->infile, STDIN_FILENO);
-	close(pipex->infile);
-	dup2(pipex->end[1], STDOUT_FILENO);
-	close(pipex->end[1]);
-}
-
-// char	*ft_check_r(t_command *node)
-// {
-// 	t_command *check_r = node->next;
-// 	while (check_r)
-// 	{
-// 		if(check_r->type != RED_OUT)
-// 			break;
-// 		check_r = check_r->next;
-// 	}
-// 	return(check_r->file);
-// }
-
-// void	outfile(t_command *node, t_pipex *pipex)
-// {
-// 	if (ft_lstlast(node)->type == RED_OUT)
-// 		pipex->outfile = open(ft_lstlast(node)->file, O_RDWR | O_TRUNC | O_CREAT, 0644);
-// 	close(pipex->end[0]);
-// 	close(pipex->end[1]);
-// 	if (pipex->outfile == -1)
-// 	{
-// 		perror("outfile fail");
-// 		exit(-1);
-// 	}
-// 	dup2(pipex->outfile, STDOUT_FILENO);
-// 	close(pipex->outfile);
-// }
-//< infile	ls | grep f | wc -l > outfile
-void	all_cmd(t_command *node1, char **env, t_pipex *pipex)
-{
-	// printf("allcmd >> i = %d\n", pipex->i);
-	// printf("type = %d\n", node1->type);
-
-	// if (pipex->i == 1)
-	// {
-	// 	printf("infile\n");
-	// 	infile(pipex);
-	// 	//printf("infile >> i = %d\n", pipex->i);
-	// }
-	// else if (node1->next->type == RED_OUT)
-	// {
-
-	// 	printf("outfile = %s\n", node1->next->file);
-	// 	outfile(node1, pipex);
-	// }
-	// else
-	// {
-		close(pipex->end[0]);
-		dup2(pipex->end[1], STDOUT_FILENO);
-		close(pipex->end[1]);
-	// }
-	ft_excute(*node1->args, env);
+	pid_t	pid;
+	if (pipe(p->end) == -1)
+		ft_error_2();
+	pid = fork();
+	if (pid == -1)
+		ft_error_2();
+	else if (pid == 0)
+    {
+        if (p->flag == 1)
+        {
+            printf("read_in\n");
+            close(p->end[0]);
+            dup2(p->infile, STDIN_FILENO);
+            close(p->infile);
+            dup2(p->end[1], STDOUT_FILENO);
+            close(p->end[1]);
+            ft_excute(node1->args, env);
+        }
+        else if (p->flag == 2)
+        {
+            //printf("1\n");
+            close(p->end[0]);
+            p->infile_here_doc = open("file_here_doc.txt", O_RDONLY, 0644);
+            dup2(p->infile_here_doc, 0);
+            close(p->infile_here_doc);
+            ft_excute(node1->args, env);
+        }
+        else if (node1->type == CMD && node1->next != NULL && node1->next->type == RED_OUT)
+        {
+            printf("read_out\n");
+            close(p->end[0]);
+            close(p->end[1]);
+            dup2(p->outfile, STDOUT_FILENO);
+            close(p->outfile);
+            ft_excute(node1->args, env);
+        }
+        else if (node1->type == CMD && node1->next == NULL)
+        {
+            printf("STIN_OUT\n");
+            ft_excute(node1->args, env);
+        }
+        else
+        {
+            printf("CMD\n");
+            close(p->end[0]);
+            dup2(p->end[1], STDOUT_FILENO);
+            close(p->end[1]);
+            ft_excute(node1->args, env);
+        }
+    }
+        // all_cmd(node1, env, pipex);
+	close(p->end[1]);
+	dup2(p->end[0], STDIN_FILENO);
+	close(p->end[0]);
+    wait(NULL);
+	//return (pid);
 }
