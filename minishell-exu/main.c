@@ -15,12 +15,15 @@ void    ft_pipe(t_command *node1, char **ev, t_pipex *p)
         {
             if (cur->type == RED_IN)
                 p->flag = 1;
-            else if (cur->type == HRER_DOC)
-                p->flag = 2;
             cur = cur->next;
         }
         else if (cur->type != RED_OUT && cur->type == CMD)
         {
+            if (ft_strcmp(cur->args[0], "cat") == 0 && cur->next->type == HRER_DOC)
+            {
+                printf("flag == 2\n");
+                p->flag = 2;
+            }
             fork_pipe(cur, ev, p);
             //waitpid(pid, &status, 0);
             p->flag = 0;
@@ -37,33 +40,29 @@ int main(int ac, char **av, char **ev)
     (void)av;
     t_pipex	pipex;
     t_command *node1 = malloc(sizeof(t_command));
-    node1->type = RED_IN;
-    node1->args = (char *[]){"b.txt", NULL};
+    node1->type = CMD;
+    node1->args =(char *[]){"cat", NULL};
     node1->next = NULL;
     t_command *node2 = malloc(sizeof(t_command));
-    node2->type = CMD;
-    node2->args =(char *[]){"cat", NULL};
+    node2->type = HRER_DOC;
+    node2->args =(char *[]){"lop", NULL};
     node1->next = node2;
     t_command *node3 = malloc(sizeof(t_command));
-    node3->type = HRER_DOC;
-    node3->args =(char *[]){"limt", NULL};
+    node3->type = PIPE;
+    node3->args = NULL;
+    // node3->args = NULL;
     node1->next->next = node3;
     t_command *node4 = malloc(sizeof(t_command));
-    node4->type = PIPE;
-    node4->args = NULL;
-    // node4->args = NULL;
+    node4->type = CMD;
+    node4->args = (char *[]){"grep", "l", NULL};
     node1->next->next->next = node4;
-    t_command *node5 = malloc(sizeof(t_command));
-    node5->type = CMD;
-    node5->args = (char *[]){"wc", NULL};
-    node1->next->next->next->next = node5;
-    t_command *node6 = malloc(sizeof(t_command));
-    node6->type = HRER_DOC;
-    node6->args = (char *[]){"grep", NULL};
-    node1->next->next->next->next->next = node6;
+    // t_command *node6 = malloc(sizeof(t_command));
+    // node6->type = PIPE;
+    // node6->args = NULL;
+    // node1->next->next->next->next->next = node6;
     // t_command *node7 = malloc(sizeof(t_command));
-    // node7->type = PIPE;
-    // node7->args =  NULL;
+    // node7->type = CMD;
+    // node7->args =  (char *[]) {"wc", "-l", NULL};
     // node1->next->next->next->next->next->next = node7;
     // t_command *node8 = malloc(sizeof(t_command));
     // node8->type = CMD;

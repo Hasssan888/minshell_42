@@ -22,11 +22,13 @@ void	fork_pipe(t_command *node1, char **env, t_pipex *p)
         }
         else if (p->flag == 2)
         {
-            //printf("1\n");
+            printf("HEREDOC\n");
             close(p->end[0]);
             p->infile_here_doc = open("file_here_doc.txt", O_RDONLY, 0644);
             dup2(p->infile_here_doc, 0);
             close(p->infile_here_doc);
+            dup2(p->end[1], 1);
+            close(p->end[1]);
             ft_excute(node1->args, env);
         }
         else if (node1->type == CMD && node1->next != NULL && node1->next->type == RED_OUT)
